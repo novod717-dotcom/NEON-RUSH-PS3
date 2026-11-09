@@ -1,0 +1,37 @@
+
+name: Build NEON RUSH
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - 'NEON_RUSH_PS3_Homebrew_Source.zip'
+      - '.github/workflows/build.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    container:
+      image: flipacholas/ps3devextra:latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Extract project
+        run: |
+          mkdir -p project
+          unzip -q NEON_RUSH_PS3_Homebrew_Source.zip -d project
+
+      - name: Compile
+        run: |
+          cd project/NEON_RUSH_PS3_HOMEbrew
+          make
+
+      - name: Save compiled files
+        uses: actions/upload-artifact@v4
+        with:
+          name: NEON-RUSH-BUILD
+          path: |
+            project/**/*.self
+            project/**/*.elf
+          if-no-files-found: error
